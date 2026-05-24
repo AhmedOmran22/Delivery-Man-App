@@ -1,4 +1,5 @@
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sixvalley_delivery_boy/utill/dimensions.dart';
@@ -136,7 +137,7 @@ class _SliderButtonWidgetState extends State<SliderButtonWidget> {
             });
 
             widget.action();
-            if (widget.vibrationFlag) {
+            if (widget.vibrationFlag && !kIsWeb) {
               try {
                 Vibration.vibrate(duration: 200);
               } catch (e) {

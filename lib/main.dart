@@ -26,16 +26,19 @@ late AndroidNotificationChannel channel;
 
 
 Future<void> main() async {
-  HttpOverrides.global = MyHttpOverrides();
+  if (!kIsWeb) {
+    HttpOverrides.global = MyHttpOverrides();
+  }
 
   setPathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
 
-  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
-
+  if (!kIsWeb) {
+    await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
+  }
 
   if(Firebase.apps.isEmpty){
-    if(Platform.isAndroid){
+    if(!kIsWeb && Platform.isAndroid){
       try{
         await Firebase.initializeApp(options: const FirebaseOptions(
             apiKey: "current_key here",
@@ -54,7 +57,7 @@ Future<void> main() async {
 
 
 
-  if(defaultTargetPlatform == TargetPlatform.android) {
+  if(!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await FirebaseMessaging.instance.requestPermission();
   }
 
@@ -66,18 +69,22 @@ Future<void> main() async {
   NotificationBody? body;
 
   try {
-    channel = const AndroidNotificationChannel(
-      'high_importance_channel',
-      'High Importance Notifications',
-      importance: Importance.high,
-    );
+    if (!kIsWeb) {
+      channel = const AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.high,
+      );
+    }
     final RemoteMessage? remoteMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (remoteMessage != null) {
       body = NotificationBody.fromJson(remoteMessage.data);
     }
-    await NotificationHelper.initialize(flutterLocalNotificationsPlugin);
-    FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
-    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
+    if (!kIsWeb) {
+      await NotificationHelper.initialize(flutterLocalNotificationsPlugin);
+      FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
+      await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
+    }
   }catch(_) {}
 
 

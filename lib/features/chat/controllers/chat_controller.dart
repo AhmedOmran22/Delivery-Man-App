@@ -428,6 +428,14 @@ class ChatController extends GetxController implements GetxService{
 
 
   void downloadFile(String url, String dir, String openFileUrl, String fileName) async {
+    if (kIsWeb) {
+      // On web, open the file URL directly in the browser
+      // ignore: avoid_web_libraries_in_flutter
+      // Use url_launcher or just open the link
+      var snackBar = const SnackBar(content: Text('Opening file...'), backgroundColor: Colors.black54, duration: Duration(seconds: 1));
+      ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
+      return;
+    }
 
     var snackBar = const SnackBar(content: Text('Downloading....'),backgroundColor: Colors.black54, duration: Duration(seconds: 1),);
     ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
@@ -512,10 +520,11 @@ class ChatController extends GetxController implements GetxService{
   }
 
   Future<String?> generateThumbnail(String filePath) async {
+    if (kIsWeb) return null;
     final directory = await getTemporaryDirectory();
 
     final thumbnailPath = await VideoThumbnail.thumbnailFile(
-      video: filePath, // Replace with your video URL
+      video: filePath,
       thumbnailPath: directory.path,
       imageFormat: ImageFormat.PNG,
       maxHeight: 100,

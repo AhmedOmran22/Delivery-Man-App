@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -86,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _checkPermission(BuildContext context) async {
+    if (kIsWeb) return;
     LocationPermission permission = await Geolocator.checkPermission();
     if(permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
